@@ -17,7 +17,7 @@
 #define PID 6
 #define CID 7
 
-#define IS_PROBLEM_2 true
+#define IS_PROBLEM_2 false
 #define RUN_TESTS false
 #define VERBOSE false
 #define EXTRA_VERBOSE false
