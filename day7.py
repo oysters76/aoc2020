@@ -1,5 +1,50 @@
 '''
-Program to go from unstructured text -> tokens -> abstract syntax tree 
+Program to go from unstructured text -> tokens -> abstract syntax tree
+
+output:
+[light red]
+  ├── 1x bright white
+  │   └── 1x shiny gold
+  │       ├── 1x dark olive
+  │       │   ├── 3x faded blue
+  │       │   └── 4x dotted black
+  │       └── 2x vibrant plum
+  │           ├── 5x faded blue
+  │           └── 6x dotted black
+  └── 2x muted yellow
+      ├── 2x shiny gold
+      │   ├── 1x dark olive
+      │   │   ├── 3x faded blue
+      │   │   └── 4x dotted black
+      │   └── 2x vibrant plum
+      │       ├── 5x faded blue
+      │       └── 6x dotted black
+      └── 9x faded blue
+[dark orange]
+  ├── 3x bright white
+  │   └── 1x shiny gold
+  │       ├── 1x dark olive
+  │       │   ├── 3x faded blue
+  │       │   └── 4x dotted black
+  │       └── 2x vibrant plum
+  │           ├── 5x faded blue
+  │           └── 6x dotted black
+  └── 4x muted yellow
+      ├── 2x shiny gold
+      │   ├── 1x dark olive
+      │   │   ├── 3x faded blue
+      │   │   └── 4x dotted black
+      │   └── 2x vibrant plum
+      │       ├── 5x faded blue
+      │       └── 6x dotted black
+      └── 9x faded blue
+[bright white]
+  └── 1x shiny gold
+      ├── 1x dark olive
+      │   ├── 3x faded blue
+      │   └── 4x dotted black
+[faded blue]
+[dotted black]
 '''
 
 COMMA   = 'comma'
@@ -101,6 +146,7 @@ class Parser:
         number_tok = self.consume(NUMBER)
         bag_name = self.parse_bag_name()
         self.consume(BAGS)
+
         return {'count': int(number_tok.token_value), 'name': bag_name}
 
     def parse_child_list(self):
@@ -130,7 +176,64 @@ class Parser:
 
         children = self.parse_contents()
         return {parent:children} 
+
+class Graph:
+    def __init__(self):
+        self.bag_map = {}
+
+    def add(self, d):
+        for key in d.keys():
+            children = d[key]
+            if key not in self.bag_map.keys():
+                self.bag_map[key] = {}
+            for child in children:
+                count, child_name = child["count"], child["name"]
+                if not child_name in self.bag_map[key].keys():
+                    self.bag_map[key][child_name] = 0
+                self.bag_map[key][child_name] += count
+                
+    def visualize(self, start_node=None, indent="", visited=None):
+        """
+        Recursively prints the bag hierarchy starting from a specific node.
+        If no start_node is provided, it prints all top-level bags.
+        """
+        if visited is None:
+            visited = set()
+
+        # If no starting point, find all roots (keys that exist in the map)
+        if start_node is None:
+            for root in self.bag_map.keys():
+                print(f"[{root}]")
+                self.visualize(root, "  ", visited)
+            return
+
+        # Avoid infinite recursion if the graph has cycles
+        if start_node in visited:
+            return
+        visited.add(start_node)
+
+        # Get children for the current node
+        children = self.bag_map.get(start_node, {})
         
-l = lex("dark orange bags contain 3 bright white bags, 4 muted yellow bags.")
-p = Parser(l)
-print(p.parse())
+        for i, (child_name, count) in enumerate(children.items()):
+            # Create a nice visual branch
+            is_last = i == len(children) - 1
+            connector = "└── " if is_last else "├── "
+            
+            print(f"{indent}{connector}{count}x {child_name}")
+            
+            # Recurse into the child if it has its own children
+            next_indent = indent + ("    " if is_last else "│   ")
+            if child_name in self.bag_map:
+                self.visualize(child_name, next_indent, visited.copy())
+
+prog = ['light red bags contain 1 bright white bag, 2 muted yellow bags.','dark orange bags contain 3 bright white bags, 4 muted yellow bags.','bright white bags contain 1 shiny gold bag.','muted yellow bags contain 2 shiny gold bags, 9 faded blue bags.','shiny gold bags contain 1 dark olive bag, 2 vibrant plum bags.','dark olive bags contain 3 faded blue bags, 4 dotted black bags.','vibrant plum bags contain 5 faded blue bags, 6 dotted black bags.','faded blue bags contain no other bags.','dotted black bags contain no other bags.']
+
+graph = Graph()     
+
+for st in prog:
+    l = lex(st)
+    p = Parser(l)
+    graph.add(p.parse())
+    
+graph.visualize()
