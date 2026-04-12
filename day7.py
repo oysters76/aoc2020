@@ -43,6 +43,31 @@ output:
       ├── 1x dark olive
       │   ├── 3x faded blue
       │   └── 4x dotted black
+      └── 2x vibrant plum
+          ├── 5x faded blue
+          └── 6x dotted black
+[muted yellow]
+  ├── 2x shiny gold
+  │   ├── 1x dark olive
+  │   │   ├── 3x faded blue
+  │   │   └── 4x dotted black
+  │   └── 2x vibrant plum
+  │       ├── 5x faded blue
+  │       └── 6x dotted black
+  └── 9x faded blue
+[shiny gold]
+  ├── 1x dark olive
+  │   ├── 3x faded blue
+  │   └── 4x dotted black
+  └── 2x vibrant plum
+      ├── 5x faded blue
+      └── 6x dotted black
+[dark olive]
+  ├── 3x faded blue
+  └── 4x dotted black
+[vibrant plum]
+  ├── 5x faded blue
+  └── 6x dotted black
 [faded blue]
 [dotted black]
 '''
